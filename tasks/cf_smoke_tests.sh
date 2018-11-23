@@ -18,7 +18,7 @@ tee $CONFIG <<EOF
   "org": "${cf_org}",
   "space": "${cf_space}",
   "use_existing_org": true,
-  "use_existing_space": true
+  "use_existing_space": false
 }
 EOF
 
