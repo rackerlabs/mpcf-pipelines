@@ -1,0 +1,20 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcloudops/cf-smoke-tests
+inputs:
+  - name: cf-smoke-tests
+  - name: mpcf-pipelines
+run:
+  path: mpcf-pipelines/tasks/cf_smoke_tests.sh
+
+params:
+  cf_api:
+  cf_user:
+  cf_password:
+  cf_org:
+  cf_space:
+  cf_apps_domain:
+  cf_deployment:
