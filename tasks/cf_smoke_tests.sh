@@ -16,7 +16,7 @@ tee $CONFIG <<EOF
   "user": "${cf_user}",
   "password": "${cf_password}",
   "org": "${cf_org}",
-  "space": "${cf_space",
+  "space": "${cf_space}",
   "use_existing_org": true,
   "use_existing_space": true
 }
