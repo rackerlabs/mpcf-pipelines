@@ -18,3 +18,4 @@ params:
   cf_space:
   cf_apps_domain:
   cf_deployment:
+  datadog_key:
