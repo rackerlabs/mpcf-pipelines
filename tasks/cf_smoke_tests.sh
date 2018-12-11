@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -u
 
 starttime=$(date +%s)
 
@@ -17,6 +17,7 @@ tee $CONFIG <<EOF
   "password": "${cf_password}",
   "org": "${cf_org}",
   "space": "${cf_space}",
+  "deployment": "${cf_deployment}",
   "use_existing_org": true,
   "use_existing_space": true
 }
@@ -32,6 +33,21 @@ else
   loggregator="--focus=Loggregator:"
 fi
 
+# If there are other apps in the cf org and space, let's just fail
+space_guid=$(cf curl /v2/spaces | jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
+if [ -z "$space_guid" ]
+then
+   echo "unable to determine space guid."
+   exit 1
+fi
+
+space_apps=$(cf curl /v2/spaces/"${space_guid}"/apps |jq .total_results)
+
+if [[ $space_apps != "0" ]]
+then
+    echo "number of apps in this space does not equal 0. refusing to run"
+    exit 1
+fi
 
 cd /go/src/github.com/cloudfoundry/cf-smoke-tests/
 ginkgo -r --succinct -slowSpecThreshold=300 -v -trace ${loggregator}
@@ -55,14 +71,14 @@ echo "smoke.status curl data: \"series\" :
          [{\"metric\":\"smoke.status\",
           \"points\":[[$currenttime, $cf_smoke_success]],
           \"type\":\"gauge\",
-          \"tags\":[\"deployment:$deployment\",\"loggregator_enabled:$loggregator_enabled\"]"
+          \"tags\":[\"deployment:$cf_deployment\",\"loggregator_enabled:$loggregator_enabled\"]"
 
 curl -X POST -H "Content-type: application/json" \
   -d "{ \"series\" :
          [{\"metric\":\"smoke.status\",
           \"points\":[[$currenttime, $cf_smoke_success]],
           \"type\":\"gauge\",
-          \"tags\":[\"deployment:$deployment\",\"loggregator_enabled:$loggregator_enabled\"]
+          \"tags\":[\"deployment:$cf_deployment\",\"loggregator_enabled:$loggregator_enabled\"]
         }]
       }" \
 "https://app.datadoghq.com/api/v1/series?api_key=${datadog_key}"
@@ -74,7 +90,7 @@ echo "execution time curl data: \"series\" :
          [{\"metric\":\"smoke.execution_time_ms\",
           \"points\":[[$currenttime, $ELAPSED_TIME]],
           \"type\":\"gauge\",
-          \"tags\":[\"deployment:$deployment\",\"loggregator_enabled:$loggregator_enabled\"]"
+          \"tags\":[\"deployment:$cf_deployment\",\"loggregator_enabled:$loggregator_enabled\"]"
 
 
 curl -X POST -H "Content-type: application/json" \
@@ -82,7 +98,7 @@ curl -X POST -H "Content-type: application/json" \
          [{\"metric\":\"smoke.execution_time_ms\",
           \"points\":[[$currenttime, $ELAPSED_TIME]],
           \"type\":\"gauge\",
-          \"tags\":[\"deployment:$deployment\",\"loggregator_enabled:$loggregator_enabled\"]
+          \"tags\":[\"deployment:$cf_deployment\",\"loggregator_enabled:$loggregator_enabled\"]
         }]
       }" \
 "https://app.datadoghq.com/api/v1/series?api_key=${datadog_key}"
