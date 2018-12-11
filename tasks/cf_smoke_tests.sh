@@ -32,7 +32,7 @@ chmod +x ./jq
 cf login -a "${cf_api}" -u "${cf_user}" -p "${cf_password}" -o "${cf_org}" -s "${cf_space}"
 
 # If there are other apps in the cf org and space, let's just fail
-total_pages=$(cf curl "/v2/spaces?results-per-page=100"|jq .total_pages)
+total_pages=$(cf curl "/v2/spaces?results-per-page=100"| ./jq .total_pages)
 
 for x in `seq 1 ${total_pages}`;
 do
