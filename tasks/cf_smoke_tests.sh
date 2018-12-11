@@ -27,6 +27,7 @@ cat $CONFIG
 
 wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
 mv jq-linux64 jq
+chmod +x ./jq
 
 # If there are other apps in the cf org and space, let's just fail
 space_guid=$(cf curl /v2/spaces | ./jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
