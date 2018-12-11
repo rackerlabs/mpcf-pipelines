@@ -29,6 +29,8 @@ wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
 mv jq-linux64 jq
 chmod +x ./jq
 
+cf login -a "${cf_api}" -u "${cf_user}" -p "${cf_password}" -o "${cf_org}" -s "${cf_space}"
+
 # If there are other apps in the cf org and space, let's just fail
 space_guid=$(cf curl /v2/spaces | ./jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
 if [ -z "$space_guid" ]
