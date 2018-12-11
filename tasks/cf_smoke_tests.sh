@@ -32,7 +32,18 @@ chmod +x ./jq
 cf login -a "${cf_api}" -u "${cf_user}" -p "${cf_password}" -o "${cf_org}" -s "${cf_space}"
 
 # If there are other apps in the cf org and space, let's just fail
-space_guid=$(cf curl /v2/spaces | ./jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
+total_pages=$(cf curl "/v2/spaces?results-per-page=100"|jq .total_pages)
+
+for x in `seq 1 ${total_pages}`;
+do
+    space_guid=$(cf curl "/v2/spaces?order-direction=asc&page=${x}&results-per-page=100" \
+		     | ./jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
+
+    if [ ! -z ${space_guid} ]; then
+	break
+    fi
+done
+
 if [ -z "$space_guid" ]
 then
    echo "unable to determine space guid."
