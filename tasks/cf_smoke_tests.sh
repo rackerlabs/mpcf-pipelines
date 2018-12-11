@@ -25,15 +25,18 @@ EOF
 
 cat $CONFIG
 
+wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+mv jq-linux64 jq
+
 # If there are other apps in the cf org and space, let's just fail
-space_guid=$(cf curl /v2/spaces | jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
+space_guid=$(cf curl /v2/spaces | ./jq -r --arg i "${cf_space}" '.resources[] | select(.entity.name == $i) | .metadata.guid')
 if [ -z "$space_guid" ]
 then
    echo "unable to determine space guid."
    exit 1
 fi
 
-space_apps=$(cf curl /v2/spaces/"${space_guid}"/apps |jq .total_results)
+space_apps=$(cf curl /v2/spaces/"${space_guid}"/apps | ./jq .total_results)
 
 if [[ $space_apps != "0" ]]
 then
