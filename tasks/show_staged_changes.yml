@@ -1,0 +1,11 @@
+---
+platform: linux
+
+inputs:
+  - name: env
+
+run:
+  path: mpcf-pipelines/tasks/show_staged_changes.sh
+
+params:
+  ENV_FILE: env.yml
