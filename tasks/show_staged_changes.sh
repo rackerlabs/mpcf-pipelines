@@ -9,6 +9,9 @@ STAGED_MANIFEST=$(mktemp)
 
 alias om="om --env env/${ENV_FILE}"
 
+#get jq installed
+apt-get install -y jq
+
 # Get all the deployed products
 om -k curl --silent  --path /api/v0/deployed/products | jq -r .[].guid | grep -v bosh > ${TEMP_DEPLOYED_PRODUCTS}
 om -k curl --silent  --path /api/v0/staged/products | jq -r .[].guid > ${TEMP_STAGED_PRODUCTS}
