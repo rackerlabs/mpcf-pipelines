@@ -11,9 +11,6 @@ OM_CMD="om --env env/${ENV_FILE} -k curl --silent --path"
 #get jq installed
 apt-get install -y jq
 
-#get jq installed
-apt-get install -y jq
-
 # Get all the deployed products
 ${OM_CMD} /api/v0/deployed/products | jq -r .[].guid | grep -v bosh > ${TEMP_DEPLOYED_PRODUCTS}
 ${OM_CMD} /api/v0/staged/products | jq -r .[].guid > ${TEMP_STAGED_PRODUCTS}
