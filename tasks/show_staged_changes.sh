@@ -21,9 +21,11 @@ while read i; do
         echo "****** $i STAGED CHANGES ******"
         # Get the deployed manifest given a product guid
         ${OM_CMD} /api/v0/deployed/products/${i}/manifest > ${DEPLOYED_MANIFEST}
+        sleep 1
 
         #Get the staged manifest
         ${OM_CMD} /api/v0/staged/products/${i}/manifest | jq .manifest > ${STAGED_MANIFEST}
+        sleep 1
 
         # Diff the files
         diff --unified=5 ${DEPLOYED_MANIFEST} ${STAGED_MANIFEST} || true
